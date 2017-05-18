@@ -1,4 +1,6 @@
 const electron = require('electron')
+const ipc = require('electron').ipcMain
+
 // Module to control application life.
 const app = electron.app
 // Module to create native browser window.
@@ -6,6 +8,9 @@ const BrowserWindow = electron.BrowserWindow
 
 const path = require('path')
 const url = require('url')
+
+const globalShortcut = electron.globalShortcut
+
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -23,7 +28,7 @@ function createWindow (framing, transparency) {
   }))
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools()
+  //mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -39,15 +44,33 @@ function createWindow (framing, transparency) {
 // Some APIs can only be used after this event occurs.
 app.on('ready', function () {
   createWindow();
+  globalShortcut.register('CommandOrControl+E', () => {
+    app.quit()
+  })
+  globalShortcut.register('CommandOrControl+H', () => {
+    app.hide()
+  })
+  globalShortcut.register('CommandOrControl+S', () => {
+    app.show()
+  })
+  globalShortcut.register('CommandOrControl+N', () => {
+    createWindow(true, true)
+  })
+  globalShortcut.register('CommandOrControl+F', () => {
+    createWindow(false,false)
+  })
+  globalShortcut.register('CommandOrControl+P', () => {
+    mainWindow.webContents.send('showSurprise')
+  });
 })
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
+  //if (process.platform !== 'darwin') {
     app.quit()
-  }
+//  }
 })
 
 app.on('activate', function () {
